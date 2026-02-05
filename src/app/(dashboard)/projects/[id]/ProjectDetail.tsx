@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import type { Project, Task, Budget, ProjectStatus } from '@/types/database'
+import type { Project, Task, Budget, Photo, Document, ProjectStatus } from '@/types/database'
 import {
   ArrowLeft,
   MapPin,
@@ -27,6 +27,8 @@ import {
 import { format, differenceInDays } from 'date-fns'
 import GanttChart from './GanttChart'
 import BudgetTab from './BudgetTab'
+import PhotosTab from './PhotosTab'
+import DocumentsTab from './DocumentsTab'
 
 const statusColors: Record<ProjectStatus, { bg: string; text: string; dot: string }> = {
   planning: { bg: 'bg-purple-500/20', text: 'text-purple-300', dot: 'bg-purple-400' },
@@ -47,12 +49,16 @@ interface ProjectDetailProps {
   project: Project
   initialTasks: Task[]
   initialBudgets: Budget[]
+  initialPhotos: Photo[]
+  initialDocuments: Document[]
 }
 
-export default function ProjectDetail({ project: initialProject, initialTasks, initialBudgets }: ProjectDetailProps) {
+export default function ProjectDetail({ project: initialProject, initialTasks, initialBudgets, initialPhotos, initialDocuments }: ProjectDetailProps) {
   const [project, setProject] = useState<Project>(initialProject)
   const [tasks, setTasks] = useState<Task[]>(initialTasks)
   const [budgets, setBudgets] = useState<Budget[]>(initialBudgets)
+  const [photos, setPhotos] = useState<Photo[]>(initialPhotos)
+  const [documents, setDocuments] = useState<Document[]>(initialDocuments)
   const [activeTab, setActiveTab] = useState('overview')
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
@@ -241,16 +247,10 @@ export default function ProjectDetail({ project: initialProject, initialTasks, i
           <BudgetTab projectId={project.id} budgets={budgets} setBudgets={setBudgets} />
         )}
         {activeTab === 'photos' && (
-          <div className="text-center py-16 text-slate-400">
-            <Camera className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p>Photo management coming soon</p>
-          </div>
+          <PhotosTab projectId={project.id} photos={photos} setPhotos={setPhotos} />
         )}
         {activeTab === 'documents' && (
-          <div className="text-center py-16 text-slate-400">
-            <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p>Document management coming soon</p>
-          </div>
+          <DocumentsTab projectId={project.id} documents={documents} setDocuments={setDocuments} />
         )}
       </div>
 

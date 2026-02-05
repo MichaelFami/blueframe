@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import ProjectDetail from './ProjectDetail'
-import type { Project, Task, Budget } from '@/types/database'
+import type { Project, Task, Budget, Photo, Document } from '@/types/database'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -41,11 +41,27 @@ export default async function ProjectPage({ params }: PageProps) {
     .select('*')
     .eq('project_id', id)
 
+  // Fetch photos for this project
+  const { data: photos } = await supabase
+    .from('photos')
+    .select('*')
+    .eq('project_id', id)
+    .order('uploaded_date', { ascending: false })
+
+  // Fetch documents for this project
+  const { data: documents } = await supabase
+    .from('documents')
+    .select('*')
+    .eq('project_id', id)
+    .order('uploaded_date', { ascending: false })
+
   return (
     <ProjectDetail
       project={project as Project}
       initialTasks={(tasks as Task[]) || []}
       initialBudgets={(budgets as Budget[]) || []}
+      initialPhotos={(photos as Photo[]) || []}
+      initialDocuments={(documents as Document[]) || []}
     />
   )
 }
